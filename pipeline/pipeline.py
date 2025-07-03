@@ -48,7 +48,7 @@ def convertTifftoJPG(base_path):
 
 def PositiveNegativePercentages(ImageDataFrame):
   """Calculating the positive negative and white percentages for a single ImageDataframe, this edits the datafrme to contain the number of pixels that are between the thresholds. These thresholds can be changed. Also a threshold for balck pixels should be added.
-
+  
   Args:
       ImageDataFrame (DataFrame): Image in Dataframe form
   """
@@ -57,20 +57,42 @@ def PositiveNegativePercentages(ImageDataFrame):
   white = (ImageDataFrame['Darkness'] > white_threshold).sum()
   gram_positive = (ImageDataFrame['Darkness'] < gram_positive_threshold).sum()
   gram_negative = ((gram_positive_threshold < ImageDataFrame['Darkness']) & (ImageDataFrame['Darkness'] < white_threshold)).sum()
-  
-# This will prints the percents of each type 
 def printPercents(ImageDataFrame,white,gram_positive,gram_negative):
-  print('Percent of White ' + str(percent(white,len(ImageDataFrame))) + '%')
-  print('Percent of gram positive ' + str(percent(gram_positive ,len(ImageDataFrame)))+ '%')
-  print('Percent of gram negative ' + str(percent(gram_negative, len(ImageDataFrame)))+ '%')
+    """ Print the Percents of white,gram_positive and gram_negative in a given image
+
+    Args:
+        ImageDataFrame (_npArray_): Image as a number Dataframe
+        white (_int_): # of white pixels
+        gram_positive (_int_): # of positive classified pixels
+        gram_negative (_int_): # of negative classified pixels
+    """
+    print('Percent of White ' + str(percent(white,len(ImageDataFrame))) + '%')
+    print('Percent of gram positive ' + str(percent(gram_positive ,len(ImageDataFrame)))+ '%')
+    print('Percent of gram negative ' + str(percent(gram_negative, len(ImageDataFrame)))+ '%')
   
-def extract_numbers(text):
-  numbers_str = re.findall(r'\d+', text)
-  numbers_int = [int(num) for num in numbers_str]
-  return numbers_int
+def extract_numbers(file_name):
+    """ Extract the numbers from a file name 
+
+    Args:
+        file_name (text): Local file path 
+
+    Returns:
+        _type_: the numbers in the filename
+    """
+    numbers_str = re.findall(r'\d+', file_name)
+    numbers_int = [int(num) for num in numbers_str]
+    return numbers_int
 
 
 def image_to_df(image):
+    """ Turn an image into a dataframe containing a darkness column
+    
+    Args:
+        image (_jpg_): Image FilePath
+
+    Returns:
+        _DataFrame_: Image -> DataFrame while adding Darkness Column
+    """
     imageArray = np.array(image)
     reshaped = imageArray.reshape(-1, 3)
     df = pd.DataFrame(reshaped, columns=["Red", "Green", "Blue"])
@@ -78,6 +100,7 @@ def image_to_df(image):
     return df
 
 def get_mouse_summary_df(mouse_name, folderPath):
+    miceNames = ["mouse1"]
     white_threshold = 225
     gram_positive_threshold = 35
     listofDays = miceNames.get(mouse_name)
@@ -124,31 +147,32 @@ def get_mouse_summary_df(mouse_name, folderPath):
     df.to_csv(mouse_name, index=False)
     return df
 
+""" Everything Below was Case Specific for Cohort 1"""
 # Path to Kaplan Lab HDD
 # "D:" Goes to the HDD, After that inset file name
-folderPath = ""
+# folderPath = ""
 
 # Hashmap to Hold all of the Dataframes for each mouse and day
-miceNames = {}
+# miceNames = {}
 
 # Iterate through files in folder Path
-for filename in os.listdir(folderPath):
-    fileTypeTag = str(filename[-3:]).strip()
-    nameSplit = filename.split("_")
-    dayNumber = extract_numbers(nameSplit[0])[0]
-    imageNumber = nameSplit[1]
-    name = nameSplit[2]
-    fileTypeTag = str(filename[-3:]).strip()
+# for filename in os.listdir(folderPath):
+#     fileTypeTag = str(filename[-3:]).strip()
+#     nameSplit = filename.split("_")
+#     dayNumber = extract_numbers(nameSplit[0])[0]
+#     imageNumber = nameSplit[1]
+#     name = nameSplit[2]
+#     fileTypeTag = str(filename[-3:]).strip()
     
-    # Counting the Number of Photos 
-    if name in miceNames:
-        currLists = miceNames[name]
+#     # Counting the Number of Photos 
+#     if name in miceNames:
+#         currLists = miceNames[name]
         
-        thislist = currLists[dayNumber - 1]
-        thislist.append(filename)
-    else:
-        miceNames[name] = days = [[] for _ in range(15)]
-        currLists = miceNames[name]
+#         thislist = currLists[dayNumber - 1]
+#         thislist.append(filename)
+#     else:
+#         miceNames[name] = days = [[] for _ in range(15)]
+#         currLists = miceNames[name]
         
-        thislist = currLists[dayNumber - 1]
-        thislist.append(filename)
+#         thislist = currLists[dayNumber - 1]
+#         thislist.append(filename)
