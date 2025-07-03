@@ -5,47 +5,53 @@ import os
 import re
 import matplotlib.pyplot as plt
 
-# Turn image into a Dataframe, 
 def image_to_df(image):
-  # imageArray will have shape (height,width,3)
+  """Return image reshaped as an ndarray"""
   imageArray = np.array(image)
-  # reshaped size is (height * width, 3)
   reshaped = imageArray.reshape(-1,3)
   return reshaped
-
-# Function to Calculate percentages
 def percent(value,total):
+  """ return the percent of the value with a base of the total"""
   return (value / total) * 100
-
 def darkness_luminosity(row):
-        # This is the NTSC formula to convert RGB values into Grayscale
-        # "This formula closely represents the average person's relative perception of the brightness of red, green and blue light."
-        # The smaller the values the darker the pixel
-       return (0.299 * row['Red'] + 0.587 * row['Green'] + 0.114 * row['Blue'])
-    
-# Tiff to JPG Function and save with same filename as given replaced with "jpg"
+  """ Using the NTSC formula to convert RGB values into Grayscale, this formula closely represents the average persons relative perception of brighness in red,green and blue light. Smaller values represent darker pixels.
+
+  Args:
+      row (int): a row from an image dataframe and contains red,green and blue columns
+  Returns:
+      int : darkness value
+  """
+  return (0.299 * row['Red'] + 0.587 * row['Green'] + 0.114 * row['Blue'])
 def saveTifftoJPG(base_path):
+  """ Turn a tiff to a jpg, using the same path name but replacing the tiff with a jpg and using some image conversion
+
+  Args:
+      base_path (file_path):  saves the image as a jpg at the same file_path
+  """
   tiff_image = Image.open(base_path)
   new_path = base_path[:-3] + "jpg"
   jpge_image = tiff_image.convert("RGB")
   jpge_image.save(new_path)
-
-
-# TIff to Jpg, returns the JPG image but does not save it
 def convertTifftoJPG(base_path):
+  """ Convert Tiff to JPG and return it
+
+  Args:
+      base_path (file_path): relative path of the tiff file 
+
+  Returns:
+      Image : returns image as a JPG directly does not save it
+  """
   tiff_image = Image.open(base_path)
   new_path = base_path[:-3] + "jpg"
   jpgImage = tiff_image.convert("RGB")
   return jpgImage
 
-# Greater than this is considered white or nothing
-white_threshold = 225
-
-# Greater than this is labeled as gram positive, less than this is a black pixel 
-gram_positive_threshold = 35
-
-# This is for calculting the positive negative percentages for a single ImageDataFram, might have to be edited for 5 images
 def PositiveNegativePercentages(ImageDataFrame):
+  """Calculating the positive negative and white percentages for a single ImageDataframe, this edits the datafrme to contain the number of pixels that are between the thresholds. These thresholds can be changed. Also a threshold for balck pixels should be added.
+
+  Args:
+      ImageDataFrame (DataFrame): Image in Dataframe form
+  """
   white_threshold = 225
   gram_positive_threshold = 35
   white = (ImageDataFrame['Darkness'] > white_threshold).sum()
@@ -72,6 +78,8 @@ def image_to_df(image):
     return df
 
 def get_mouse_summary_df(mouse_name, folderPath):
+    white_threshold = 225
+    gram_positive_threshold = 35
     listofDays = miceNames.get(mouse_name)
     if not listofDays:
         print(f"No data for mouse: {mouse_name}")
